@@ -1,0 +1,432 @@
+---
+title: "4.1 Vizualizacija"
+author: "Damir Pintar"
+date: "December 12, 2016"
+output: 
+  #html_document: default
+  ioslides_presentation: 
+    fig_height: 4
+    highlight: haddock
+    smaller: yes
+    transition: slower
+    widescreen: yes
+  
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Eksploratorna analiza podataka
+
+Eksploratorna analiza podataka - EDA (engl. *exploratory data analysis*): proces analize podatkovnog skupa s ciljem upoznavanja s podacima i donošenjem određenih zaključaka.
+
+- često se identificiraju tri faze procesa:
+    - transformacija podataka (engl. *data wrangling*)
+    - vizualizacija podataka
+    - izrada modela
+- ove tri faze nisu slijedne već cirkularne i često se međusobno prožimaju
+
+## Eksploratorna analiza podataka (2)
+- osnovni cilj eksploratorne analize
+    - odgovoriti na **pitanja** koje smišlja sam analitičar
+    - bitna kreativnost i znatiželja; analitičar ima aktivnu ulogu, nije pasivan promatrač podataka
+    - pitanja se najčešće tiču **varijabilnosti** podataka i **odnosa** između varijabli
+    
+## Eksploratorna analiza podataka (3)
+
+1. Transformacija podataka 
+     - već smo upoznali učenjem paketa `tidyr`, `dplyr` ...
+2. Vizualizacija podataka 
+    - paketi `base`, `grid`, `lattice`, `ggplot2`...
+    - tema ove lekcije
+3. Modeliranje podataka 
+    - stvaranje sažetih, konciznih reprezentacija podataka kroz matematičke (i druge modele) 
+    - upoznati ćemo kasnije
+
+## Vizualizacija podataka u jeziku R
+
+- R se često koristi kao "vizualizacijski alat" 
+     - brojne mogućnosti za stvaranje profesionalnih, vizualno atraktivnih i lako interpretabilnih grafova.
+
+- osnovna podrška za vizualizaciju - tzv. `base plotting` sustav
+     - temelji se na generičkoj funkciji `plot`
+     - ukratko - gotovo svaku popularniju klasu proslijedimo navedenoj funkciji što će često rezultirati kompetentnom vizualnom reprezentacijom
+    
+
+## ZADATAK 1 - funkcija `plot`
+
+```{r, echo = T}
+x <- 1:50
+# proslijedite `x` i `x*x` funkciji `plot`
+
+```
+
+
+
+## ZADATAK 1 - funkcija `plot`
+
+```{r, echo = T}
+x <- 1:50
+# proslijedite `x` i `x*x` funkciji `plot`
+plot(x, x*x)
+
+```
+
+
+## Prednosti i nedostaci funkcije `plot`
+
+Prednosti:
+
+- jednostavno, brzo i učinkovito rješenje
+- univerzalnost primjene
+
+Nedostaci:
+
+- grafu se mogu dodavati stvari, ali ne i modificirati
+- složenost naglo raste sa porastom zahtjeva nad vizualizacijom
+
+## Dodatni vizualizacijski paketi
+
+Paket `grid`
+
+- bogatiji skup funkcija od osnovne podrške
+- nema podršku za "statistike" tako da je često prije vizualizacije potrebno "ručno" računanje vrijednosti koje želimo prikazati
+
+<hr>
+
+Paket `lattice`
+
+- popularan za stvaranje tzv. "uvjetnih" ("facetiranih") grafova
+- prilično autonoman, npr. ima podršku za automatsko stvaranje legendi i sl.
+- nije zasnovan na formalnom modelu, teško proširivanje novim funkcionalnostima
+
+
+## Paket `ggplot2`
+
+- jedan od (općenito!) najpopularnijih R paketa
+    - https://www.rdocumentation.org/trends
+    
+- zasnovan na tzv. "grafičkoj gramatici" (engl. *grammar of graphics*)
+
+- temelji se na jasno definiranom formalnom modelu
+
+- krivulja učenja inicijalno nešto strmija
+
+## Paket `ggplot2` (2)
+
+
+- odlična podrška za stvaranje širokog spektra vizualizacija na osnovu koncizne, jasne i sažete sintakse 
+
+- omogućuje lako proširenje dodatnim funkcionalnostima
+
+- reimplementiran i u drugim programskim jezicima (paket `ggplot` u *Python-u*, paket `gramm` u *Matlab*-u)
+
+
+## Grafička gramatika i paket `ggplot2`
+
+Grafička gramatika (engl. *grammar of graphics*) nam daje sljedeće:
+
+* principe koji omogućuju stvaranje i interpretaciju kompleksnih vizualizacija
+* naputke što predstavlja "dobro oblikovanu" ili "kvalitetnu" vizualizaciju
+
+Grafove gledamo kao svojevrsne "rečenice" čije razumijevanje ovisi o tome kako pojedine komponente uklopiti u jasnu, razumljivu cjelinu.
+
+Naputak - graf gledati kao sumu "komponenti" od kojih svaka ima svoju ulogu i doprinosi konačnom rezultatu.
+
+* gramatička ispravnost nije garancija kvalitetne rečenice!
+
+
+## Grafička gramatika i paket `ggplot2` (2)
+
+Za početak, tri osnovne komponente:
+
+1. **podaci** (koje želimo vizualizirati)
+2. **estetike** (mapiranja podataka na elemente grafa)
+3. **geometrije** (grafička reprezentacija podataka na grafu)
+
+<hr>
+`graf = podaci + mapiranje + geometrija `
+<hr>
+
+## **Podaci** <font color = "#DDDDDD">/ Estetike / Geometrija</font>
+
+Podatkovni skup je ključna komponenta grafa, predstavlja "ono što želimo vizualizirati".
+
+Podaci su neovisni od ostatka procesa vizualizacije, budući da se isti principi vizualizacije mogu primjeniti nad različitim podatkovnim skupovima).
+
+   - ali: karakteristike podatkovnog skupa često direktno utječu na odabir daljnjih koraka.
+    
+    
+## <font color = "#DDDDDD">Podaci / </font>Estetike <font color = "#DDDDDD">/ Geometrija</font>
+
+Pojam "estetika" nema veze sa "znanosti o lijepom", ovdje se radi o odabiru kako ćemo na grafu prikazati (mapirati) pojedini stupac.
+
+Uobičajeni princip: 
+
+   - Kartezijev koordinatni sustav
+   - osi *x* i *y* kao "osnovne estetike"
+   - kada "određujemo osnovne estetike grafa" onda kažemo npr. "ovaj stupac/  varijablu stavljam na os x, a ovaj drugi stupac na os y"
+   
+## <font color = "#DDDDDD">Podaci / </font>Estetike <font color = "#DDDDDD">/ Geometrija</font>
+
+
+Osi koordinatnog sustava nisu jedine estetike, ovisno o tome kakav graf crtamo estetike mogu biti:
+
+- boja 
+- oblik
+- prozirnost
+- tip uzorka (npr. način crtkanosti linije)
+- itd.
+
+Estetiku možemo interpretirati i kao "ono što se objašnjava legendom", pri čemu i osi *x* i *y* možemo smatrati svojevrsnim legendama.
+
+## <font color = "#DDDDDD">Podaci / Estetike / </font> Geometrija</font>
+
+"Geometrija" je zapravo "opis kako nešto nacrtati na grafu", tj. sam način vizualne reprezentacije.
+
+To je ono što često zovemo "vrstom" grafa npr.:
+
+- "točkasti graf" (engl. *scatterplot*)
+- linijski graf
+- stupčasti graf (engl. *bar chart*)
+- histogram itd.
+
+Svaka geometrija definira svoje parametre koji se mogu povezati sa estetikama (mapiranjima).
+
+- npr. kod točkastog grafa pored koordinate svake točke možemo birati oblik "točke", boju, prozirnost itd.
+- ako je parametar povezan sa estetikom onda će ovisiti o vrijednosti varijable (npr. boja opisuje vrijednost neke kategorije), ako ne onda je fiksiran na razini grafa (npr. želimo "crvene" točke)
+
+
+## ZADATAK 2 - učitavanje okvira `mtcars`
+
+Koristiti ćemo podatkovni skup `mtcars` koji dolazi sa jezikom R (paket `datasets`). Podatkovni skup možemo učitati u globalnu okolinu uz pomoć funkcije `data`.
+
+```{r, echo = T}
+
+# Učitajte podatkovni skup `mtcars` u globalnu okolinu
+
+# proučite okvir `mtcars`  (head, glimpse, ?...)
+
+```
+
+## ZADATAK 2 - učitavanje okvira `mtcars` (2)
+
+```{r, echo = T}
+
+# Učitajte podatkovni skup `mtcars` u globalnu okolinu
+data(mtcars)
+
+# proučite okvir `mtcars`  (head, glimpse, ?...)
+glimpse(mtcars)
+
+```
+
+## ZADATAK 2 - učitavanje okvira `mtcars` (3)
+
+```{r, echo = T}
+head(mtcars, 10)
+
+
+```
+
+## Crtanje prvog `ggplot2` grafa
+
+Odabrani podatkovni skup `mtcars` ima 32 obzervacije i 11 varijabli (sve numeričkog tipa). Zamislimo da želimo vizualizirati odnos dvije varijable, npr. potrošnju (`mpg`, koja predstavlja broj milja koliko auto prijeđe na jedan galon benzina) i težinu (`wt`, izraženu u tisućama funti). 
+
+Možemo odabrati sljedeći način mapiranja:
+
+* težina automobila (`wt`) na *x* os grafa
+* potrošnja (`mpg`) na *y* os grafa
+
+
+
+## Crtanje prvog `ggplot2` grafa
+
+
+```{r, eval = F}
+ggplot() + 
+layer( data = mtcars,                      # 1. podaci
+       mapping = aes(x = wt, y = mpg),     # 2. mapiranja / estetike
+       geom = "point",                     # 3. geometrija
+       stat = "identity",                  # za sada zanemariti
+       position = "identity")              # za sada zanemariti
+```
+
+## Crtanje prvog `ggplot2` grafa
+
+
+```{r}
+ggplot() + 
+layer( data = mtcars,                      # 1. podaci
+       mapping = aes(x = wt, y = mpg),     # 2. mapiranja / estetike
+       geom = "point",                     # 3. geometrija
+       stat = "identity",                  # za sada zanemariti
+       position = "identity")              # za sada zanemariti
+```
+
+## Crtanje prvog `ggplot2` grafa
+
+Obično ne koristimo funkciju `layer` već kombinaciju funkcija `ggplot` (u kojoj postavimo "zajedničke" parametre podataka i estetika) te odabrane pomoćne `geom_X` funkcije.
+
+```{r}
+ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
+```
+
+## Crtanje prvog `ggplot2` grafa
+
+Postoji i funkcija `qplot` koja zapravo "imitira" sintaksu funkcije `plot` i služi za lakšu prilagodbu paketu `ggplot` za funkcije naviknute na osnovne načine vizualizacije u R-u. Ovu funkciju nećemo koristiti u nastavku uglavnom zbog njezinih ograničenih mogućnosti.
+
+```{r}
+qplot(x = wt, y = mpg, data = mtcars)
+
+```
+
+
+## ZADATAK 3 - `shape` estetika 
+
+Dodajmo još jednu varijablu u prikazani graf uz pomoć nove estetike - oblika točaka.
+
+```{r}
+# faktorizirajte varijablu `cyl`
+
+# stvorite graf ovisnosti `mpg` o `wt`
+# uz mapiranje `cyl` varijable na `shape` estetiku
+
+```
+
+
+## ZADATAK 3 - `shape` estetika 
+
+```{r}
+# faktorizirajte varijablu `cyl`
+mtcars$cyl <- as.factor(mtcars$cyl)
+
+# stvorite graf ovisnosti `mpg` o `wt`
+# uz mapiranje `cyl` varijable na `shape` estetiku
+ggplot(mtcars, aes(x = wt, y = mpg, shape = cyl)) + geom_point()
+
+```
+
+
+
+## ZADATAK 4 - `color` estetika 
+
+Pogledajmo sada estetiku bojr - tj. `color` estetiku.
+
+```{r}
+# stvorite graf ovisnosti `mpg` o `wt`
+# ovaj put mapirajte `cyl` varijable na `color` estetiku
+
+```
+
+
+## ZADATAK 4 - `color` estetika 
+
+
+```{r}
+# stvorite graf ovisnosti `mpg` o `wt`
+# ovaj put mapirajte `cyl` varijable na `color` estetiku
+ggplot(mtcars, aes(x = wt, y = mpg, color = cyl)) + geom_point()
+
+```
+
+
+
+## ZADATAK 5 - jedna varijabla na dvije estetike
+
+Istu varijablu slobodno možemo mapirati na više estetika.
+
+```{r}
+# ponovite isti graf, ali varijablu `cyl` mapirajte
+# i na `color` i na `shape` estetiku
+
+```
+
+
+
+## ZADATAK 5 - jedna varijabla na dvije estetike
+
+
+```{r}
+# ponovite isti graf, ali varijablu `cyl` mapirajte
+# i na `color` i na `shape` estetiku
+ggplot(mtcars, aes(x = wt, y = mpg, color = cyl, shape = cyl)) + geom_point()
+
+```
+
+## Preimenovanje osi, legende, dodavanje naslova
+
+Ukoliko želimo, uz pomoć funkcije `labs` lako primenujemo osi ili legende te dodajemo naslov našem grafu. Sintaksa izgleda ovako:
+
+`ggplot(... ) + ...`
+
+`... + labs(x = "x os", y = "y os", ...`
+
+`    title = "Naslov")`
+
+## ZADATAK 6 - funkcija `labs`
+
+
+```{r}
+# na sljedećem grafu preimenujte osi i legendu
+# te dodajte adekvatni naslov (najbolje nešto što objašnjava graf)
+ggplot(mtcars, aes(x = wt, y = mpg, color = cyl, shape = cyl)) + geom_point() 
+
+```
+
+## ZADATAK 6 - funkcija `labs`
+
+
+```{r}
+# na sljedećem grafu preimenujte osi i legendu
+# te dodajte adekvatni naslov (najbolje nešto što objašnjava graf)
+ggplot(mtcars, aes(x = wt, y = mpg, color = cyl, shape = cyl)) + geom_point() +
+labs(x = "Težina / 1000 lb", y = "Potrošnja / milja po galonu",
+     color = "Broj cilindara", shape = "Broj cilindara",
+   title = "Teži auti više troše (manje milja na jedan galon benzina)")
+
+```
+
+## Fiksni parametri geometrije
+
+Estetike tj. mapiranja direktno utječu na parametre geometrije, tj. oni vise o vrijednostima varijabli koje mapiramo na njih. Ukoliko želimo "fiksirati" parametre geometrije, dovoljno ih je navesti kao parametre geometrijskog sloja sa pripadajućim vrijednostima (ali NE unutar Â¸funkcije `aes`!).
+
+<hr>
+Primjer sintakse:
+
+`ggplot(...) + .... `
+
+` + geom_point(color = "red")`
+
+<hr>
+Primjer KRIVE sintakse:
+
+
+`ggplot(...) + .... `
+
+` + geom_point(aes(color = "red"))   # mapira riječ "red" na estetiku 'color'!`
+
+<hr>
+
+## ZADATAK 7 - fiksni parametri geometrije
+
+```{r}
+# nacrajte graf ovisnosti maksimalne brzine o težini automobila
+# koristite geometriju točke
+# točke neka budu crvene boje i neka koriste kod za oblik broj 4
+```
+
+
+## ZADATAK 7 - fiksni parametri geometrije
+
+```{r}
+# nacrajte graf ovisnosti maksimalne brzine o težini automobila
+# koristite geometriju točke
+# točke neka budu crvene boje i neka koriste kod za oblik broj 4
+ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point(color = "blue")
+```
+
+
+

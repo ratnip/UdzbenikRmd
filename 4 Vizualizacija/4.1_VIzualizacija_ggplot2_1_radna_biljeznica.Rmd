@@ -1,0 +1,174 @@
+---
+title: "4.1 Vizualizacija"
+author: "Damir Pintar"
+date: "December 12, 2016"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+<hr>
+
+### ZADATAK 1 - funkcija `plot`
+
+```{r, echo = T}
+x <- 1:50
+# proslijedite `x` i `x*x` funkciji `plot`
+
+```
+
+<hr>
+
+### ZADATAK 2 - učitavanje okvira `mtcars`
+
+Koristiti ćemo podatkovni skup `mtcars` koji dolazi sa jezikom R (paket `datasets`). Podatkovni skup možemo učitati u globalnu okolinu uz pomoć funkcije `data`.
+
+```{r, echo = T}
+
+# Učitajte podatkovni skup `mtcars` u globalnu okolinu
+
+# proučite okvir `mtcars`  (head, glimpse, ?...)
+
+```
+
+<hr>
+
+### Crtanje prvog `ggplot2` grafa
+
+Odabrani podatkovni skup `mtcars` ima 32 obzervacije i 11 varijabli (sve numeričkog tipa). Zamislimo da želimo vizualizirati odnos dvije varijable, npr. potrošnju (`mpg`, koja predstavlja broj milja koliko auto prijeÄ‘e na jedan galon benzina) i težinu (`wt`, izraženu u tisućama funti). 
+
+Možemo odabrati sljedeći način mapiranja:
+
+* težina automobila (`wt`) na *x* os grafa
+* potrošnja (`mpg`) na *y* os grafa
+
+<hr>
+
+### Crtanje prvog `ggplot2` grafa
+
+
+```{r}
+ggplot() + 
+layer( data = mtcars,                      # 1. podaci
+       mapping = aes(x = wt, y = mpg),     # 2. mapiranja / estetike
+       geom = "point",                     # 3. geometrija
+       stat = "identity",                  # za sada zanemariti
+       position = "identity")              # za sada zanemariti
+```
+
+
+Obično ne koristimo funkciju `layer` već kombinaciju funkcija `ggplot` (u kojoj postavimo "zajedničke" parametre podataka i estetika) te odabrane pomoćne `geom_X` funkcije.
+
+```{r}
+ggplot(mtcars, aes(x = wt, y = mpg)) + geom_point()
+```
+
+
+Postoji i funkcija `qplot` koja zapravo "imitira" sintaksu funkcije `plot` i služi za lakšu prilagodbu paketu `ggplot` za funkcije naviknute na osnovne načine vizualizacije u R-u. Ovu funkciju nećemo koristiti u nastavku uglavnom zbog njezinih ograničenih mogućnosti.
+
+```{r}
+qplot(x = wt, y = mpg, data = mtcars)
+
+```
+
+<hr>
+
+### ZADATAK 3 - `shape` estetika 
+
+Dodajmo još jednu varijablu u prikazani graf uz pomoć nove estetike - oblika točaka.
+
+```{r}
+# faktorizirajte varijablu `cyl`
+
+# stvorite graf ovisnosti `mpg` o `wt`
+# uz mapiranje `cyl` varijable na `shape` estetiku
+
+```
+
+<hr>
+
+### ZADATAK 4 - `color` estetika 
+
+Pogledajmo sada estetiku bojr - tj. `color` estetiku.
+
+```{r}
+# stvorite graf ovisnosti `mpg` o `wt`
+# ovaj put mapirajte `cyl` varijable na `color` estetiku
+
+```
+
+
+<hr>
+
+### ZADATAK 5 - jedna varijabla na dvije estetike
+
+Istu varijablu slobodno možemo mapirati na više estetika.
+
+```{r}
+# ponovite isti graf, ali varijablu `cyl` mapirajte
+# i na `color` i na `shape` estetiku
+
+```
+
+
+<hr>
+
+### Preimenovanje osi, legende, dodavanje naslova
+
+Ukoliko želimo, uz pomoć funkcije `labs` lako primenujemo osi ili legende te dodajemo naslov našem grafu. Sintaksa izgleda ovako:
+
+`ggplot(... ) + ...`
+
+`... + labs(x = "x os", y = "y os", ...`
+
+`    title = "Naslov")`
+
+<hr>
+
+### ZADATAK 6 - funkcija `labs`
+
+
+```{r}
+# na sljedećem grafu preimenujte osi i legendu
+# te dodajte adekvatni naslov (najbolje nešto što objašnjava graf)
+#ggplot(mtcars, aes(x = wt, y = mpg, color = cyl, shape = cyl)) + geom_point() 
+
+```
+
+<hr>
+
+### Fiksni parametri geometrije
+
+Estetike tj. mapiranja direktno utječu na parametre geometrije, tj. oni ovise o vrijednostima varijabli koje mapiramo na njih. Ukoliko želimo "fiksirati" parametre geometrije, dovoljno ih je navesti kao parametre geometrijskog sloja sa pripadajućim vrijednostima (ali NE unutar Â¸funkcije `aes`!).
+
+Primjer sintakse:
+
+`ggplot(...) + .... `
+
+` + geom_point(color = "red")`
+
+
+Primjer KRIVE sintakse:
+
+
+`ggplot(...) + .... `
+
+` + geom_point(aes(color = "red"))   # mapira riječ "red" na estetiku 'color'!`
+
+
+<hr>
+
+### ZADATAK 7 - fiksni parametri geometrije
+
+```{r}
+# nacrajte graf ovisnosti maksimalne brzine o težini automobila
+# koristite geometriju točke
+# točke neka budu crvene boje i neka koriste kod za oblik broj 4
+```
+
